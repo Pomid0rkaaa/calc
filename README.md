@@ -39,6 +39,14 @@ Examples:
 ./build/calc "10 / 4 + 1.5"
 ```
 
+## Tests
+
+The project includes a suite of automated tests to ensure the parser handles both standard arithmetic and edge cases (like operator precedence and nested parentheses) correctly.
+To execute the test suite:
+```bash
+make test
+```
+
 ## Error handling
 
 The calculator reports errors for invalid input, such as:
