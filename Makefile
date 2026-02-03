@@ -1,9 +1,9 @@
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++17 -Iinclude
 
-SRC = src/main.cpp
+SRC = src/main.cpp src/parser.cpp
 OBJ = $(SRC:src/%.cpp=build/%.o)
-	TARGET = build/calc
+TARGET = build/calc
 
 all: $(TARGET)
 
