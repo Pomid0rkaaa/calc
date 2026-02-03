@@ -12,11 +12,31 @@ class Parser {
 
 public:
   Parser(const string& str) : s(str) {}
+  
   double parse() {
+    return parseExpression();
+  }
+
+  double parseNumber() {
     size_t start = pos;
     while (pos < s.size() && (isdigit(s[pos]) || s[pos] == '.')) pos++;
     if (start == pos) throw runtime_error("Expected number");
     return stod(s.substr(start, pos - start));
+  }
+
+  double parseExpression() {
+    double left = parseNumber();
+
+    while (pos < s.size()) {
+      char op = s[pos];
+      if (op != '+' && op != '-') break;
+      pos++;
+
+      double right = parseNumber();
+      if (op == '+') left += right;
+      else left -= right;
+    }
+    return left;
   }
 };
 
