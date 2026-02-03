@@ -1,6 +1,6 @@
 # Simple CLI Calculator
 
-A tily command-line calculator written in C++ that evaluates arithmetic expressions using a recursive descent parser.
+A tiny command-line calculator written in C++ that evaluates arithmetic expressions using a recursive descent parser.
 
 Supports:
 - Addition and subtraction: `+ -`
