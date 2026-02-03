@@ -14,29 +14,9 @@ public:
   Parser(const string& str) : s(str) {}
   
   double parse() {
-    return parseExpression();
-  }
-
-  double parseNumber() {
-    size_t start = pos;
-    while (pos < s.size() && (isdigit(s[pos]) || s[pos] == '.')) pos++;
-    if (start == pos) throw runtime_error("Expected number");
-    return stod(s.substr(start, pos - start));
-  }
-  
-  double parseTerm() {
-    double left = parseNumber();
-
-    while (pos < s.size()) {
-      char op = s[pos];
-      if (op != '*' && op != '/') break;
-      pos++;
-
-      double right = parseNumber();
-      if (op == '*') left *= right;
-      else left /= right;
-    }
-    return left;
+    double result = parseExpression();
+    if (pos != s.size()) throw runtime_error("Unexpected trailing characters");
+    return result;
   }
 
   double parseExpression() {
@@ -53,9 +33,38 @@ public:
     }
     return left;
   }
-};
 
-double eval(const string& expr);
+  double parseTerm() {
+    double left = parseFactor();
+
+    while (pos < s.size()) {
+      char op = s[pos];
+      if (op != '*' && op != '/') break;
+      pos++;
+
+      double right = parseFactor();
+      if (op == '*') left *= right;
+      else left /= right;
+    }
+    return left;
+  }
+  
+  double parseFactor() {
+    if(s[pos] == '(') {
+      pos++;
+      double left = parseExpression();
+      if (pos >= s.size() || s[pos] != ')')
+        throw runtime_error("Missing closing parenthesis");
+      pos++;
+      return left;
+    }
+
+    size_t start = pos;
+    while (pos < s.size() && (isdigit(s[pos]) || s[pos] == '.')) pos++;
+    if (start == pos) throw runtime_error("Expected number");
+    return stod(s.substr(start, pos - start));
+  }
+};
 
 int main(int argc, char* args[]) {
   string expr = "";
@@ -63,12 +72,8 @@ int main(int argc, char* args[]) {
     expr += args[i];
   }
   if (expr.empty()) return EXIT_FAILURE;
-  cout << eval(expr) << endl;
-  return EXIT_SUCCESS;
-}
-
-double eval(const string& expr) {
   Parser p(expr);
-  return p.parse();
+  cout << p.parse() << endl;
+  return EXIT_SUCCESS;
 }
 
