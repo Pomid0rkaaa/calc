@@ -19,10 +19,15 @@ public:
     return result;
   }
 
+  void skipSpaces() {
+    while (pos < s.size() && isspace(s[pos])) pos++;
+  }
+
   double parseExpression() {
     double left = parseTerm();
 
     while (pos < s.size()) {
+      skipSpaces();
       char op = s[pos];
       if (op != '+' && op != '-') break;
       pos++;
@@ -38,6 +43,7 @@ public:
     double left = parseFactor();
 
     while (pos < s.size()) {
+      skipSpaces();
       char op = s[pos];
       if (op != '*' && op != '/') break;
       pos++;
@@ -50,9 +56,11 @@ public:
   }
   
   double parseFactor() {
+    skipSpaces();
     if(s[pos] == '(') {
       pos++;
       double left = parseExpression();
+      skipSpaces();
       if (pos >= s.size() || s[pos] != ')')
         throw runtime_error("Missing closing parenthesis");
       pos++;
