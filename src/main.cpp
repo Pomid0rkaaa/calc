@@ -23,16 +23,31 @@ public:
     if (start == pos) throw runtime_error("Expected number");
     return stod(s.substr(start, pos - start));
   }
+  
+  double parseTerm() {
+    double left = parseNumber();
+
+    while (pos < s.size()) {
+      char op = s[pos];
+      if (op != '*' && op != '/') break;
+      pos++;
+
+      double right = parseNumber();
+      if (op == '*') left *= right;
+      else left /= right;
+    }
+    return left;
+  }
 
   double parseExpression() {
-    double left = parseNumber();
+    double left = parseTerm();
 
     while (pos < s.size()) {
       char op = s[pos];
       if (op != '+' && op != '-') break;
       pos++;
 
-      double right = parseNumber();
+      double right = parseTerm();
       if (op == '+') left += right;
       else left -= right;
     }
