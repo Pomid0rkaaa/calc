@@ -20,6 +20,21 @@ run_test() {
   fi
 }
 
+run_error_test() {
+  expr="$1"
+
+  output=$($BIN "$expr" 2>&1)
+  status=$?
+
+  if [[ $status -ne 0 ]]; then
+    echo -e "${CPASS}PASS${CEND} (error): $expr -> $output"
+  else
+    echo -e "${CFAIL}FAIL${CEND} (expected error): $expr -> got '$output'"
+    FAIL=1
+  fi
+}
+
+
 echo "Running calc tests..."
 
 run_test "2+2" "4"
@@ -27,6 +42,16 @@ run_test "2+3*4" "14"
 run_test "(2+3)*4" "20"
 run_test "10/4" "2.5"
 run_test "3 + 4 * (2 - 1)" "7"
+run_test "1/0" "inf"
+run_test "0-1/0" "-inf"
+
+echo
+echo "Running error tests..."
+
+run_error_test "2+"
+run_error_test "(3+4"
+run_error_test "abc"
+run_error_test "3 + 4 * (2 - 1))"
 
 echo
 if [ $FAIL -eq 0 ]; then
