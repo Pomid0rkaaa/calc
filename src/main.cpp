@@ -1,3 +1,4 @@
+#include <exception>
 #include <iostream>
 #include "parser.hpp"
 
@@ -8,7 +9,12 @@ int main(int argc, char* args[]) {
   }
   if (expr.empty()) return EXIT_FAILURE;
   Parser p(expr);
-  std::cout << p.parse() << std::endl;
+  try {
+    std::cout << p.parse() << std::endl;
+  } catch (const std::exception& e) {
+    std::cerr << "Error: " << e.what() << std::endl;
+    return EXIT_FAILURE;
+  }
   return EXIT_SUCCESS;
 }
 
