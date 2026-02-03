@@ -44,6 +44,9 @@ run_test "10/4" "2.5"
 run_test "3 + 4 * (2 - 1)" "7"
 run_test "1/0" "inf"
 run_test "0-1/0" "-inf"
+run_test '((((10))))' "10"
+run_test "  3.5  +  1.5  " "5"
+run_test "10 - 2 - 2 - 2" "4"
 
 echo
 echo "Running error tests..."
@@ -52,6 +55,9 @@ run_error_test "2+"
 run_error_test "(3+4"
 run_error_test "abc"
 run_error_test "3 + 4 * (2 - 1))"
+run_error_test ""
+run_error_test "   "
+run_error_test "5 * / 2"
 
 echo
 if [ $FAIL -eq 0 ]; then
