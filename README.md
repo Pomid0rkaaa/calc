@@ -41,7 +41,7 @@ Examples:
 
 ## Tests
 
-The project includes a suite of automated tests to ensure the parser handles both standard arithmetic and edge cases (like operator precedence and nested parentheses) correctly.
+The project includes a suite of tests to ensure the parser handles both standard arithmetic and edge cases (like operator precedence and nested parentheses) correctly.
 To execute the test suite:
 ```bash
 make test
