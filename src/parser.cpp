@@ -53,6 +53,9 @@ double Parser::parseTerm() {
 double Parser::parseFactor() {
   skipSpaces();
 
+  if (pos >= s.size())
+    throw std::runtime_error("Unexpected end of input");
+
   if (s[pos] == '(') {
     pos++;
     double left = parseExpression();
@@ -67,8 +70,23 @@ double Parser::parseFactor() {
   while (pos < s.size() && (std::isdigit(s[pos]) || s[pos] == '.'))
     pos++;
 
-  if (start == pos)
-    throw std::runtime_error("Expected number");
+  if (start != pos)
+    return std::stod(s.substr(start, pos - start));
 
-  return std::stod(s.substr(start, pos - start));
+  start = pos;
+  if (std::isalpha(s[pos]) || s[pos] == '_') {
+    pos++;
+    while (pos < s.size() &&
+           (std::isalpha(s[pos]) || s[pos] == '_'))
+      pos++;
+    std::string name = s.substr(start, pos - start);
+    auto it = variables.find(name);
+    if (it == variables.end())
+      throw std::runtime_error("Undefined variable: " + name);
+
+    return it->second;
+  }
+
+  throw std::runtime_error("Expected number or variable");
 }
+

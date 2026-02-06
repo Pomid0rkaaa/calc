@@ -2,6 +2,9 @@
 #define PARSER_HPP
 
 #include <string>
+#include <unordered_map>
+
+extern std::unordered_map<std::string, double> variables;
 
 class Parser {
   const std::string& s;
