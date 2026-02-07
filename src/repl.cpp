@@ -133,7 +133,7 @@ ReplResult handle_line(const std::string &input, std::ostream &out, std::ostream
 void repl() {
   std::string input = "";
   while (true) {
-    std::cout << "\n> ";
+    std::cout << std::endl << "calc> ";
     std::getline(std::cin, input);
 
     if (handle_line(input, std::cout, std::cerr) == ReplResult::Exit)
