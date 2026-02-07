@@ -25,6 +25,7 @@ run_error_test() {
 
   output=$($BIN "$expr" 2>&1)
   status=$?
+  output=$(echo "$output" | grep "Error:")
 
   if [[ $status -ne 0 ]]; then
     echo -e "${CPASS}PASS${CEND} (error): $expr -> $output"
