@@ -1,3 +1,4 @@
+#include <array>
 #include <string>
 #include <unordered_map>
 #include <iostream>
@@ -5,6 +6,30 @@
 #include "parser.hpp"
 
 std::unordered_map<std::string, double> variables;
+
+std::array<std::string, 21> help_message_repl {
+  "Calculator REPL help",
+  "",
+  "Expressions:",
+  "  - Supports +, -, *, / with standart precedence",
+  "  - Parentheses can be used to group expressions",
+  "  - Example: (1 + 2) * 3",
+  "",
+  "Variables:",
+  "  var x = 10        define or update variable",
+  "  var y = x * 2",
+  "  vars              list all variables",
+  "  del x             delete a variable",
+  "  clear | reset     remove all variables",
+  "",
+  "Commands:",
+  "  help              shows this help message",
+  "  exit              quit the REPL",
+  "",
+  "Notes:",
+  "  - Variables names may contain letters, digits, and underscores",
+  "  - Whitespaces is ignored in expressions",
+};
 
 std::string trim (std::string& str) {
   std::string trimmed;
@@ -25,6 +50,11 @@ void repl() {
     else if (input == "clear" || input == "reset") {
       variables.clear();
       std::cout << "Variables cleared" << std::endl;
+    }
+    else if (input == "help") {
+      for (const std::string& s : help_message_repl)
+        std::cout << s << std::endl;
+      continue;
     }
     else if (input.rfind("del ", 0) == 0) {
       std::string name = input.substr(4);
@@ -69,9 +99,9 @@ void repl() {
       input.find("var", 0) == 0
       && input.size() > 3
       && input[3] != ' '
-    )
+    ) {
       std::cerr << "Error: did you mean `var x = ...` ?" << std::endl;
-
+    }
     else {
       Parser p(input);
       try {
