@@ -1,6 +1,5 @@
 #include <cctype>
 #include <cstdlib>
-#include <stdexcept>
 #include "parser.hpp"
 #include "repl.hpp"
 
@@ -9,7 +8,7 @@ Parser::Parser(const std::string& str) : s(str) {}
 double Parser::parse() {
   double result = parseExpression();
   if (pos != s.size())
-    throw std::runtime_error("Unexpected trailing characters");
+    throw ParseError("Unexpected trailing characters", s, pos);
   return result;
 }
 
@@ -54,14 +53,14 @@ double Parser::parseFactor() {
   skipSpaces();
 
   if (pos >= s.size())
-    throw std::runtime_error("Unexpected end of input");
+    throw ParseError("Unexpected end of input", s, pos);
 
   if (s[pos] == '(') {
     pos++;
     double left = parseExpression();
     skipSpaces();
     if (pos >= s.size() || s[pos] != ')')
-      throw std::runtime_error("Missing closing parenthesis");
+      throw ParseError("Missing closing parenthesis", s, pos);
     pos++;
     return left;
   }
@@ -82,11 +81,11 @@ double Parser::parseFactor() {
     std::string name = s.substr(start, pos - start);
     auto it = variables.find(name);
     if (it == variables.end())
-      throw std::runtime_error("Undefined variable: " + name);
+      throw ParseError("Undefined variable: " + name, s, pos);
 
     return it->second;
   }
 
-  throw std::runtime_error("Expected number or variable");
+  throw ParseError("Expected number or variable", s, pos);
 }
 

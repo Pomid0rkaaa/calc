@@ -1,7 +1,7 @@
 #include <array>
 #include <cstdlib>
-#include <exception>
 #include <iostream>
+#include <ostream>
 #include <string>
 #include "parser.hpp"
 #include "repl.hpp"
@@ -43,8 +43,11 @@ int main(int argc, char* args[]) {
     Parser p(expr);
     try {
       std::cout << p.parse() << std::endl;
-    } catch (const std::exception& e) {
-      std::cerr << "Error: " << e.what() << std::endl;
+    } catch (const ParseError& e) {
+      std::cerr << e.input << std::endl;
+      std::cerr << std::string(e.pos, ' ') << "^" << std::endl;
+      std::cerr << "Error: " << e.message
+        << " at position " << e.pos+1 << std::endl;
       return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

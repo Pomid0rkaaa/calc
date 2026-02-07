@@ -94,8 +94,11 @@ ReplResult handle_line(const std::string &input, std::ostream &out, std::ostream
       double value = p.parse();
       variables.insert_or_assign(name, value);
       out << name << " = " << value << std::endl;
-    } catch (const std::exception& e) {
-      err << "Error: " << e.what() << std::endl;
+    } catch (const ParseError& e) {
+      int ePos = e.pos + 4 + name.size() + 1;
+      err << "var " << trimmed << std::endl;
+      err << std::string(ePos, ' ') << "^" << std::endl;
+      err << "Error: " << e.message << " at position " << ePos << std::endl;
     }
 
     return ReplResult::Continue;
@@ -123,8 +126,11 @@ ReplResult handle_line(const std::string &input, std::ostream &out, std::ostream
   try {
     Parser p(input);
     out << p.parse() << std::endl;
-  } catch (const std::exception& e) {
-    err << "Error: " << e.what() << std::endl;
+  } catch (const ParseError& e) {
+    err << e.input << std::endl;
+    err << std::string(e.pos, ' ') << "^" << std::endl;
+    err << "Error: " << e.message
+      << " at position " << e.pos+1 << std::endl;
   }
 
   return ReplResult::Continue;

@@ -18,4 +18,13 @@ private:
   double parseFactor();
 };
 
+struct ParseError : std::exception {
+  std::string message;
+  std::string input;
+  size_t pos;
+
+  ParseError(std::string msg, std::string in, size_t p)
+  : message(std::move(msg)), input(std::move(in)), pos(p) {}
+};
+
 #endif
