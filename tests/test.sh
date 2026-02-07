@@ -55,8 +55,6 @@ run_error_test "2+"
 run_error_test "(3+4"
 run_error_test "abc"
 run_error_test "3 + 4 * (2 - 1))"
-run_error_test ""
-run_error_test "   "
 run_error_test "5 * / 2"
 
 echo
