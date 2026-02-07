@@ -31,7 +31,7 @@ std::array<std::string, 21> help_message_repl {
   "  - Whitespaces is ignored in expressions",
 };
 
-std::string trim (std::string& str) {
+std::string trim (const std::string& str) {
   std::string trimmed;
   for (auto& c : str.substr(4)) {
     if (c == ' ') continue;
@@ -40,75 +40,103 @@ std::string trim (std::string& str) {
   return trimmed;
 }
 
+ReplResult handle_line(const std::string &input, std::ostream &out, std::ostream &err) {
+  if (input.empty())
+    return ReplResult::Continue;
+
+  if (input == "exit")
+    return ReplResult::Exit;
+
+  if (input == "clear" || input == "reset") {
+    variables.clear();
+    out << "Variables cleared" << std::endl;
+    return ReplResult::Continue;
+  }
+
+  if (input == "help") {
+    for (const std::string& s : help_message_repl)
+      out << s << std::endl;
+    return ReplResult::Continue;
+  }
+
+  if (input.rfind("del ", 0) == 0) {
+    std::string name = input.substr(4);
+    name.erase(0, name.find_first_not_of(" \t"));
+    name.erase(name.find_last_not_of(" \t") + 1);
+
+    if (name.empty()) {
+      err << "Error: variable name required" << std::endl;
+      return ReplResult::Continue;
+    }
+
+    if (variables.erase(name))
+      out << "Deleted " << name << std::endl;
+    else
+      err << "Error: variable not found: " << name << std::endl;
+
+    return ReplResult::Continue;
+  }
+
+  if (input.rfind("var ", 0) == 0) {
+    std::string trimmed = trim(input);
+    auto eq = trimmed.find('=');
+
+    if (eq == std::string::npos) {
+      err << "Error: invalid variable declaration" << std::endl;
+      return ReplResult::Continue;
+    }
+
+    std::string name = trimmed.substr(0, eq);
+    std::string valuestr = trimmed.substr(eq + 1);
+
+    try {
+      Parser p(valuestr);
+      double value = p.parse();
+      variables.insert_or_assign(name, value);
+      out << name << " = " << value << std::endl;
+    } catch (const std::exception& e) {
+      err << "Error: " << e.what() << std::endl;
+    }
+
+    return ReplResult::Continue;
+  }
+
+  if (input == "vars") {
+    if (variables.empty())
+      out << "No variables" << std::endl;
+    else
+      for (const auto& [name, value] : variables)
+        out << name << " = " << value << std::endl;
+
+    return ReplResult::Continue;
+  }
+
+  if (
+    input.find("var", 0) == 0
+    && input.size() > 3
+    && input[3] != ' '
+  ) {
+    err << "Error: did you mean `var x = ...` ?" << std::endl;
+    return ReplResult::Continue;
+  }
+
+  try {
+    Parser p(input);
+    out << p.parse() << std::endl;
+  } catch (const std::exception& e) {
+    err << "Error: " << e.what() << std::endl;
+  }
+
+  return ReplResult::Continue;
+}
+
 void repl() {
   std::string input = "";
-  while (1) {
-    std::cout << std::endl << "> ";
+  while (true) {
+    std::cout << "\n> ";
     std::getline(std::cin, input);
-    if (input.empty()) continue;
-    else if (input == "exit") exit(0);
-    else if (input == "clear" || input == "reset") {
-      variables.clear();
-      std::cout << "Variables cleared" << std::endl;
-    }
-    else if (input == "help") {
-      for (const std::string& s : help_message_repl)
-        std::cout << s << std::endl;
-      continue;
-    }
-    else if (input.rfind("del ", 0) == 0) {
-      std::string name = input.substr(4);
-      name.erase(0, name.find_first_not_of(" \t"));
-      name.erase(name.find_last_not_of(" \t") + 1);
-      if (name.empty()) {
-        std::cerr << "Error: variable name required" << std::endl;
-        continue;
-      }
-      if (variables.erase(name))
-        std::cout << "Deleted " << name << std::endl;
-      else
-        std::cerr << "Error: variable not found: " << name << std::endl;
-    }
-    else if (input.rfind("var ", 0) == 0) {
-      std::string trimmed = trim(input);
-      auto eq = trimmed.find('=');
-      if (eq == std::string::npos) {
-        std::cerr << "Error: invalid variable declaration" << std::endl;
-        continue;
-      }
-      std::string name = trimmed.substr(0, eq);
-      std::string valuestr = trimmed.substr(eq + 1);
-      double value = 0;
-      Parser p(valuestr);
-      try {
-        value = p.parse();
-      } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-        continue;
-      }
-      variables.insert_or_assign(name, value);
-      std::cout << name << " = " << value << std::endl;
-    }
-    else if (input == "vars") {
-      if (variables.empty())
-        std::cout << "No variables" << std::endl;
-      else for (const auto& [name, value] : variables)
-      std::cout << name << " = " << value << std::endl;
-    }
-    else if (
-      input.find("var", 0) == 0
-      && input.size() > 3
-      && input[3] != ' '
-    ) {
-      std::cerr << "Error: did you mean `var x = ...` ?" << std::endl;
-    }
-    else {
-      Parser p(input);
-      try {
-        std::cout << p.parse() << std::endl;
-      } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-      }
-    }
+
+    if (handle_line(input, std::cout, std::cerr) == ReplResult::Exit)
+      break;
   }
 }
