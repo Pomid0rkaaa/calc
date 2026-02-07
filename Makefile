@@ -1,16 +1,20 @@
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++17 -Iinclude
 
-SRC = src/main.cpp src/parser.cpp src/repl.cpp
-OBJ = $(SRC:src/%.cpp=build/%.o)
+SRC_LIB = src/parser.cpp src/repl.cpp
+SRC_APP = src/main.cpp
+
+OBJ_LIB = $(SRC_LIB:src/%.cpp=build/%.o)
+OBJ_APP = $(SRC_APP:src/%.cpp=build/%.o)
+
 TARGET = build/calc
 
 .PHONY: all build clean test
 
 all: $(TARGET)
 
-$(TARGET): $(OBJ) | build
-	$(CXX) $(CXXFLAGS) $(OBJ) -o $(TARGET)
+$(TARGET): $(OBJ_LIB) $(OBJ_APP) | build
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
 build/%.o: src/%.cpp | build
 	$(CXX) $(CXXFLAGS) -c $< -o $@
