@@ -1,8 +1,8 @@
-#include "parser.hpp"
-
 #include <cctype>
 #include <cstdlib>
 #include <stdexcept>
+#include "parser.hpp"
+#include "repl.hpp"
 
 Parser::Parser(const std::string& str) : s(str) {}
 
@@ -77,7 +77,7 @@ double Parser::parseFactor() {
   if (std::isalpha(s[pos]) || s[pos] == '_') {
     pos++;
     while (pos < s.size() &&
-           (std::isalpha(s[pos]) || s[pos] == '_'))
+           (std::isalnum(s[pos]) || s[pos] == '_'))
       pos++;
     std::string name = s.substr(start, pos - start);
     auto it = variables.find(name);
