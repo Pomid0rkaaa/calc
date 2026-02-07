@@ -55,6 +55,11 @@ double Parser::parseFactor() {
   if (pos >= s.size())
     throw ParseError("Unexpected end of input", s, pos);
 
+  if (s[pos] == '-') {
+    pos++;
+    return -parseFactor();
+  }
+
   if (s[pos] == '(') {
     pos++;
     double left = parseExpression();

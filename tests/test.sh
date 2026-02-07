@@ -51,6 +51,8 @@ run_test "0-1/0" "-inf"
 run_test '((((10))))' "10"
 run_test "  3.5  +  1.5  " "5"
 run_test "10 - 2 - 2 - 2" "4"
+run_test "-7" "-7"
+run_test "-5 + 5" "0"
 
 echo
 echo "Running error tests..."
