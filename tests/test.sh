@@ -23,18 +23,21 @@ run_test() {
 run_error_test() {
   expr="$1"
 
-  output=$($BIN "$expr" 2>&1)
+  output="$($BIN "$expr" 2>&1)"
   status=$?
-  output=$(echo "$output" | grep "Error:")
 
-  if [[ $status -ne 0 ]]; then
-    echo -e "${CPASS}PASS${CEND} (error): $expr -> $output"
+  error_line=$(echo "$output" | grep "Error")
+
+  if [[ $status -ne 0 && -n "$error_line" ]]; then
+    echo -e "${CPASS}PASS${CEND} (error): $expr -> $error_line"
   else
-    echo -e "${CFAIL}FAIL${CEND} (expected error): $expr -> got '$output'"
+    echo -e "${CFAIL}FAIL${CEND} (expected error): $expr"
+    echo "Exit code: $status"
+    echo "Output:"
+    echo "$output"
     FAIL=1
   fi
 }
-
 
 echo "Running calc tests..."
 
